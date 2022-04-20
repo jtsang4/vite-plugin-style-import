@@ -23,7 +23,8 @@ import {
 } from './utils'
 
 const ensureFileExts: string[] = ['.css', '.js', '.scss', '.less', '.styl']
-const asRE = /\s+as\s+\w+,?/g
+const middleAsRegExp = /[\s\n]+as[\s\n]+.*?,/g
+const endAsWithoutCommaRegExp = /[\s\n]+as[\s\n]+.*?}/g
 
 consola.wrapConsole()
 
@@ -178,7 +179,10 @@ export function transformImportVar(importStr: string) {
     return []
   }
 
-  const exportStr = importStr.replace('import', 'export').replace(asRE, ',')
+  const exportStr = importStr
+    .replace('import', 'export')
+    .replace(middleAsRegExp, ',')
+    .replace(endAsWithoutCommaRegExp, ' }')
   let importVariables: readonly string[] = []
   try {
     importVariables = parse(exportStr)[1]
